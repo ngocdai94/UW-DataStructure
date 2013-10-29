@@ -1,0 +1,114 @@
+// -*- mode: c++; -*-
+//
+// Copyright 2013 Systems Deployment, LLC
+// Author: Morris Bernstein (morris@systems-deployment.com)
+
+
+// META: here is the node insert function written as a single 105-line
+// monolithic function.  The helper functions were simply folded
+// in. Isn't this much harder to follow?  Makes your brain hurt?
+template<typename Thing>
+typename BTree<Thing>::Node* BTree<Thing>::Node::insert(Thing* data, Thing** found) {
+  if (is_leaf()) {
+    if (data2_) {
+      if (*data < *data1_) {
+        Node* new_sibling = new Node(data);
+        Node* new_root = new Node(data1_, new_sibling, this);
+        data1_ = data2_;
+        data2_ = NULL;
+        *found = data;
+        return new_root;
+      } else if ((*data1_ < *data) && (*data < *data2_)) {
+        Node* new_sibling = new Node(data2_);
+        data2_ = NULL;
+        Node* new_root = new Node(data, this, new_sibling);
+        *found = data;
+        return new_root;
+      } else if (*data2_ < *data) {
+        Node* new_sibling = new Node(data);
+        Node* new_root = new Node(data2_, this, new_sibling);
+        data2_ = NULL;
+        *found = data;
+        return new_root;
+      } else if (*data1_ < *data) {
+        *found = data2_;
+        return NULL;
+      } else {
+        *found = data1_;
+        return NULL;
+      }
+    } else {
+      if (*data < *data1_) {
+        data2_ = data1_;
+        data1_ = data;
+        *found = data;
+      } else if (*data1_ < *data) {
+        data2_ = data;
+        *found = data;
+      } else {
+        *found = data1_;
+      }
+      return NULL;
+    }
+  } else if (*data < *data1_) {
+    Node* overflow = left_->insert(data, found);
+    if (overflow) {
+      if (data2_) {
+        Node* new_root = new Node(data1_, overflow, this);
+        data1_ = data2_;
+        data2_ = NULL;
+        left_ = middle_;
+        middle_ = right_;
+        right_ = NULL;
+        return new_root;
+      } else {
+        data2_ = data1_;
+        data1_ = overflow->data1_;
+        right_ = middle_;
+        middle_ = overflow->middle_;
+        left_ = overflow->left_;
+        delete overflow;
+        return NULL;
+      }
+    } else {
+      return NULL;
+    }
+  } else if (*data1_ < *data && (!data2_ || *data < *data2_)) {
+    Node* overflow = middle_->insert(data, found);
+    if (overflow) {
+      if (data2_) {
+        Node* new_sibling = new Node(data2_, overflow->middle_, right_);
+        data2_ = NULL;
+        right_ = NULL;
+        middle_ = overflow->left_;
+        overflow->left_ = this;
+        overflow->middle_ = new_sibling;
+        return overflow;
+      } else {
+        data2_ = overflow->data1_;
+        middle_ = overflow->left_;
+        right_ = overflow->middle_;
+        delete overflow;
+        return NULL;
+      }
+    } else {
+      return NULL;
+    }
+  } else if (data2_ && *data2_ < *data) {
+    Node* overflow = right_->insert(data, found);
+    if (overflow) {
+      Node* new_root = new Node(data2_, this, overflow);
+      data2_ = NULL;
+      right_ = NULL;
+      return new_root;
+    } else {
+      return NULL;
+    }
+  } else if (*data1_ < *data) {
+    *found = data2_;
+    return NULL;
+  } else {
+    *found = data1_;
+    return NULL;
+  }
+}
