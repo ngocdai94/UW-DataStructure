@@ -1,0 +1,36 @@
+#! /bin/bash
+#
+# Copyright 2013 Systems Deployment, LLC
+# Author: Morris Bernstein (morris@systems-deployment.com)
+
+datadir=tmp
+fmt=png
+
+rm -f $datadir/*.unbalanced
+rm -f $datadir/*.balanced
+rm -f $datadir/*.dot
+rm -f $datadir/*.$fmt
+
+for data in $datadir/*.words ; do
+    echo "processing $data unbalanced"
+    ./red-black.py --norebalance $data > $data.unbalanced
+    diff $data.unbalanced $data.baseline
+    if [ "$?" != "0" ] ; then
+        echo "error: data mismatch $data.unbalanced"
+        exit 1
+    fi
+    echo "processing $data balanced"
+    ./red-black.py --rebalance $data > $data.balanced
+    diff $data.balanced $data.baseline
+    if [ "$?" != "0" ] ; then
+        echo "error: data mismatch $data.balanced"
+        exit 1
+    fi
+done
+
+echo "generating $fmt files"
+for i in $datadir/*.dot ; do
+    dot -T $fmt $i -o $i.$fmt
+done
+
+
