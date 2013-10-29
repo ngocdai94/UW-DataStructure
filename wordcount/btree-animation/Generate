@@ -1,0 +1,41 @@
+#! /bin/bash
+#
+# Copyright 2013 Systems Deployment, LLC
+# Author: Morris Bernstein (morris@systems-deployment.com)
+
+prog=./wordcount.py
+fmt=gif
+
+rm -rf out/
+mkdir -p out
+
+for data in data/*.words; do
+    base=$(basename $data .words)
+    baseline=data/$base.baseline
+    out=out/$base.out
+    err=out/$base.err
+    framedir=out/$base.frames
+
+    mkdir $framedir
+
+    echo generating $data frames
+    $prog out/$base.frames/frame- < $data > $out 2> $err
+    if [ "$?" != "0" ] ; then
+        echo "error generating $data (see out/$base.err)"
+        exit 1
+    fi
+
+    echo "checking counts of $data"
+    diff $out $baseline
+    if [ "$?" != "0" ] ; then
+        echo "error comparing output"
+        exit 1
+    fi
+
+    echo "generating $fmt files"
+    for i in $framedir/*.dot; do
+        #echo converting $i
+        dot -T gif -o $i.$fmt $i
+    done
+done
+
