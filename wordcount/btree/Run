@@ -1,0 +1,46 @@
+#! /bin/bash
+
+#set -x
+
+DATA=data/*.words
+
+rm -f word_counter_vector word_counter_file
+
+echo compiling word_counter_vector
+g++ -g -Wall -Werror \
+    -DBLOCK_MANAGER_IMPL=BLOCK_MANAGER_VECTOR \
+    -o word_counter_vector \
+    block.cc block_manager_vector.cc word_counter.cc word_counter_main.cc
+if [ "$?" != "0" ] ; then
+   echo build failed: word_counter_vector
+   exit 1
+fi
+
+echo compiling word_counter_file
+g++ -g -Wall -Werror \
+    -DBLOCK_MANAGER_IMPL=BLOCK_MANAGER_FILE \
+    -o word_counter_file \
+    block.cc block_manager_file.cc word_counter.cc word_counter_main.cc
+if [ "$?" != "0" ] ; then
+   echo build failed: word_counter_file
+   exit 1
+fi
+
+for data in $DATA; do
+    for prog in word_counter_vector word_counter_file; do
+        echo processing $data with $prog
+        ./$prog < $data > $data.out 2> $data.err
+        if [ "$?" != "0" ] ; then
+            echo fail $prog: $data
+            exit 1
+        fi
+        echo checking $data
+        diff -w $data.out $data.baseline
+        if [ "$?" != "0" ] ; then
+            echo error $prog: $data
+        fi
+    done
+done
+
+echo all tests pass
+exit 0

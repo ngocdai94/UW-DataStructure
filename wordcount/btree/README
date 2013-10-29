@@ -1,0 +1,12 @@
+Modular version of the instructor's solution to assignment 1.  Note
+the single header file block_manager.h coupled with two alternate
+implementations in block_manager_vector.cc (original) and
+block_manager_file.cc (low-level file I/O version).
+
+Note that the main program is completely unmodified and word_counter.h
+had a minor change (BLOCK_SIZE was moved to the newly-created
+block.h).
+
+
+In building the file version, a couple of minor bugs in block-handling
+were identified and repaired
