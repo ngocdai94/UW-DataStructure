@@ -4,6 +4,10 @@ import collections
 import re
 import sys
 
+__copyright__ = "Copyright 2013 Systems Deployment, LLC"
+__author__ = "Morris Bernstein"
+__email__ = "morris@systems-deployment.com"
+
 counter = collections.defaultdict(int)
 
 for line in sys.stdin:
