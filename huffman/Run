@@ -1,0 +1,36 @@
+#! /bin/bash
+
+DATA=test/common-sense.txt
+
+rm -f huff puff
+rm -f *.o
+rm -f test/*.huff test/*.puff
+rm -f test/*.out test/*.err
+
+echo "compiling huff"
+g++ -Wall -Werror -g -o huff \
+    bitstream.cc coding_table.cc frequency_table.cc huffman_tree.cc huff.cc
+
+echo "compiling puff"
+g++ -Wall -Werror -g -o puff \
+    bitstream.cc coding_table.cc frequency_table.cc huffman_tree.cc puff.cc
+
+echo "compressing ${DATA}"
+./huff ${DATA} > ${DATA}.huff.out 2> ${DATA}.huff.err
+
+original_size=$(cat ${DATA} | wc -c)
+compressed_size=$(cat ${DATA}.huff | wc -c)
+echo ${compressed_size} ${original_size} | awk '{printf "space savings: %d%%\n", 100.0 * (1.0 - (1.0 * $1) / $2);}'
+
+echo "expanding ${DATA}"
+./puff ${DATA}.huff > ${DATA}.huff.puff.out 2> ${DATA}.huff.puff.err
+
+cmp ${DATA} ${DATA}.huff.puff
+status=$?
+if [ "$status" != "0" ] ; then
+    echo "ERROR: files do not match"
+    exit $status
+fi
+
+echo "OK: files match"
+exit 0
