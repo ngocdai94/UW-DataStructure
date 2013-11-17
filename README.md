@@ -23,16 +23,19 @@ o shell pipeline
 heap/ contains script to generate an animation of construction and
 destruction of a binary heap (priority queue).
 
-Note that this code is *not* intended to be considered
-production-grade; it is posted to demonstrate basic computer science
-algorithms and to demonstrate programming techniques.
+huffman/ contains an implementation of the Huffman data compresion
+algorithm.
+
+Note that this code is *not* intended to be production-grade; it is
+posted to demonstrate basic computer science algorithms and to
+demonstrate programming techniques.
 
 The single most _unprofessional_ thing you can say about your
 programming is, "I bet you can't guess what this does".  Nevertheless,
-mastering list comprehensions and iterators will allow you to express
-in a single line something that might be two for loops and an if
-statement, with no loss in code clarity, a gain in your productivity,
-and possibly a performance boost.
+mastering advanced idioms such as list comprehensions and iterators
+will allow you to express in a single line something that might be two
+for loops and an if statement, with no loss in code clarity, a gain in
+your productivity, and possibly a performance boost.
 
 See also http://courses.washington.edu/css343/bernstein/
 
