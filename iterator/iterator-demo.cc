@@ -5,6 +5,12 @@
 // word in an input text.
 //
 // Iterators are, by far, the most important idiomatic form in C++.
+// They are cleverly designed to mimic the semantics of stepping
+// through an array via a pointer, for any container structure that
+// supports the operation:
+//   for(p = a; p != a + n; ++p) ...
+//   for(it = c.begin(); it != c.end(); ++it) ...
+//
 // They work because it was a fundamental design goal of the language
 // to make it possible to write user-defined types (i.e. classes) that
 // appear syntactically just like native (built-in) types.  The key
