@@ -1,0 +1,46 @@
+#! /bin/bash
+#
+# Copyright 2013 Systems Deployment, LLC
+# Author: Morris Bernstein (morris@systems-deployment.com)
+
+# set -x
+
+rm -f out/*.o
+mkdir -p out
+
+# make clean && make
+rm -f network_cost *.o
+
+echo "********** Compiling sources"
+g++ -g -Wall -Werror -o network_cost \
+    graph.cc build.cc network_cost.cc graph-draw.cc
+if [ ! $? ] ; then
+   echo Compiler error
+   exit 1
+fi
+
+declare -A start goal
+start[shortest-path-1]=AUS; goal[shortest-path-1]=MDW
+start[shortest-path-2]=DEN; goal[shortest-path-2]=ORD
+for data in shortest-path-1 shortest-path-2 ; do
+    echo "********** Running network-cost on ${data}"
+    ./network_cost -o out/${data}- ${start[$data]} ${goal[$data]} \
+	< data/${data}.txt \
+	> out/${data}.out \
+	2> out/${data}.err
+    cat out/${data}.out
+    echo "---------- Total message cost:"
+    ./total_message_cost.pl < out/${data}.out
+    if [ ! $? ] ; then
+        echo error processing $data
+        exit 1
+    fi
+done
+
+echo -n "Converting dot files"
+for dot in out/*.dot ; do
+  # echo converting ${dot}
+  echo -n .
+  dot -T gif -o ${dot}.gif ${dot}
+done
+echo " done"
