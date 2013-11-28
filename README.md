@@ -26,6 +26,9 @@ destruction of a binary heap (priority queue).
 huffman/ contains an implementation of the Huffman data compresion
 algorithm.
 
+dijkstra/ contains several implementations of Dijkstra's shortest-path
+algorithm.
+
 Note that this code is *not* intended to be production-grade; it is
 posted to demonstrate basic computer science algorithms and to
 demonstrate programming techniques.
