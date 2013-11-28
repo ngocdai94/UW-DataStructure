@@ -1,0 +1,357 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+  <title>CSS 343: Assignment 3: Shortest Path</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta http-equiv="last-modified" content="2012-10-08T07:32:01-08:00">
+  <meta http-equiv="x-ua-compatible" content="IE=edge">
+  <meta name="copyright" content="© 2012 Systems Deployment, LLC">
+  <link rel="stylesheet" type="text/css" href="CSS343-Assignment3-Shortest-Path_files/css343.css">
+  <link rel="icon" type="image/png" href="http://courses.washington.edu/css343/bernstein/assignments/systems-deployment-favicon.png">
+</head>
+<body>
+
+  <div class="logo">
+    <a href="http://www.uwb.edu/css" target="_blank">
+      <img src="CSS343-Assignment3-Shortest-Path_files/csslogo.jpg" alt="UWB and UW Seal" title="University of Washington | Bothell">
+    </a>
+  </div>
+  <hr class="logo">
+
+
+  <h1>Assignment 3: Shortest Path</h1>
+
+
+  <h2>The Problem</h2>
+
+  <p>
+    We wish to travel from some departure airport to a destination
+    airport such that we will arrive at the destination the at the
+    earliest possible time.  The direct path (if there is one) might
+    not give the earliest arrival time, so the solution will probably
+    be a multi-legged itinerary.  There is a minimum layover time at
+    every intermediate airport which must be factored into the
+    scheduling.
+  </p>
+
+  <p>
+    We also wish to know, for our chosen itinerary, the total time
+    enroute (difference between departure time of the first flight and
+    arrival time of the last flight), the total in-flight time, and
+    the total layover time.  The enroute time should equal inflight
+    time plus layover time.
+  </p>
+
+
+  <h2>The solution</h2>
+
+  <p>
+    Write a program called
+    <code>find_itinerary</code>.
+    Flight data will be read from standard input and the origin and
+    destination airports shall be command-line arguments
+    <code>argv[1]</code> (origin)
+    and
+    <code>argv[2]</code> (destination).
+  </p>
+
+  <p>
+    Write a separate stand-alone program
+    <code>flight_summary</code>
+    that takes the output of
+    <code>find_itinerary</code>
+    and produces the summary statistics enroute time, in-flight time,
+    and layover time.
+  </p>
+
+  <p>
+    Solve the problem using Dijkstra's Shortest Path algorithm.
+    Represent the network of flights as a directed graph.  Use an
+    edge list, not an adjacency matrix.
+  </p>
+
+  <p>
+    Assume the minimum layover is 1 hour.  Define this as a
+    class (static) variable so that an API might be added in some
+    future release to allow runtime control of this parameter.
+  </p>
+
+
+  <h3>Input Format</h3>
+
+  <p>
+    Each node is represented by an airport identifier (three- or
+    four-letter airport code).  Assume that some other part of the
+    hypothetical system keeps data associating the identifier with the
+    city and airport name to provide for readable output.
+  </p>
+
+  <p>
+    Time values are a (decimal) numeric value dddhhmm where ddd is the
+    day of the year (1-365), hh is the hour (24-hour clock, midnight
+    is 00) and mm is the minute (0-59).  As a simplifying assumption,
+    we won't deal with the year-end wrap-around.  Do not hesitate to
+    convert this value to some more-convenient internal format.
+  </p>
+
+  <p>
+    Each edge contains a set of flights, each with its departure and
+    arrival time.
+  </p>
+
+  <p>
+    The input file consistes of one-line records, each record
+    containing for tab-separated fields:
+  </p>
+  <ol>
+    <li>
+      origin airport
+    </li>
+    <li>
+      departure time
+    </li>
+    <li>
+      destination airport
+    </li>
+    <li>
+      arrival time
+    </li>
+  </ol>
+
+  <p>
+    There is no need to represent the airports (nodes) in the input
+    file: it can be generated from the edge list.
+  </p>
+
+
+  <h3>Output Format</h3>
+
+  <p>
+    The output will be a list of flights in the same format as the
+    input.
+  </p>
+
+
+  <h3>Example</h3>
+
+  Input:
+  <div class="codebox">
+    <code>
+      <pre>KBFI    10915    KCLM    11016
+KBFI    11230    KCLM    11329
+KBFI    11400    KCLM    11459
+KBFI    12000    KCLM    12101
+KBFI    11115    KPAE    11137
+KBFI    11330    KPAE    11352
+KBFI    11930    KPAE    11952
+KBFI    12130    KPAE    12152
+KBLI    10830    KFHR    10855
+KBLI    11415    KFHR    11440
+KBLI    10800    KPAE    10854
+KBLI    11200    KPAE    11254
+KBLI    11600    KPAE    11654
+KBLI    10815    KPWT    10933
+KBLI    11145    KPWT    11303
+KBLI    11300    KPWT    11418
+KBLI    11620    KPWT    11738
+KBLI    11910    KPWT    12028
+KCLM    11800    KPAE    11850
+KCLM    10700    KBFI    10759
+KCLM    11040    KBFI    11139
+KCLM    11517    KBFI    11616
+KCLM    12130    KBFI    12229
+KCLM    11645    KCLM    11715
+KCLM    10800    KFHR    10830
+KCLM    11315    KFHR    11345
+KCLM    11130    KPAE    11220
+KCLM    11530    KPAE    11220
+KCLM    11202    KPWT    11250
+KCLM    11630    KPWT    11718
+KFHR    11045    KBLI    11110
+KFHR    11410    KBLI    11435
+KFHR    10845    KCLM    10915
+KFHR    11120    KCLM    11150
+KFHR    11840    KCLM    11910
+KPAE    10930    KBFI    10952
+KPAE    11200    KBFI    11222
+KPAE    11420    KBFI    11442
+KPAE    11615    KBFI    11637
+KPAE    11000    KBLI    11054
+KPAE    11300    KBLI    11354
+KPAE    11700    KBLI    11754
+KPAE    10915    KCLM    11005
+KPAE    11340    KCLM    11430
+KPAE    11750    KCLM    11840
+KPWT    11000    KBLI    11118
+KPWT    11430    KBLI    11548
+KPWT    11840    KBLI    11958
+KPWT    11100    KCLM    11148
+KPWT    11540    KPWT    11628
+      </pre>
+    </code>
+  </div>
+
+
+  Output:
+  <div class="codebox">
+    <code>
+      <pre>KPWT    11100    KCLM    11148
+KCLM    11315    KFHR    11345
+
+Enroute Time: 0 days  2 hours 45 minutes
+In-Flight Time: 0 days 1 hours 18 minutes
+Layover Time: 0 days 1 hours 27 minutes
+      </pre>
+    </code>
+  </div>
+
+
+  <h2>What to Hand In</h2>
+
+  <p class="with_list">
+    The usual:
+  </p>
+  <ul>
+    <li>
+      source code
+    </li>
+    <li>
+      <code>Run</code>
+      script
+    </li>
+    <li>
+      test data
+    </li>
+    <li>
+      optional
+      <code>README</code>
+      file.
+    </li>
+  </ul>
+
+
+  <h2>Additional Notes</h2>
+
+
+  <h3>Intermediate Milestones</h3>
+
+  <p>
+    Determine them yourself.  Think about reasonable subproblems that
+    you could build and test separately.
+  </p>
+
+
+  <h3>Standard Library</h3>
+
+  <p>
+    Use
+    <code>std::map</code>
+    <em>only</em>
+    for building the graph from the file.
+    Use
+    <code>std::vector</code>
+    to hold the edge list.
+  </p>
+
+  <p>
+    Note that the STL
+    <code>priority_queue</code>
+    class is missing the
+    <code>decrease_key</code>
+    operation required by Dijkstra's algorithm, so you couldn't use it
+    even if it were permitted.
+  </p>
+
+
+  <h3>Time Differences</h3>
+
+  <p>
+    Flight data has absolute start and end times which we will wish
+    to compare.  We will also wish to compute time differences
+    (relative time or interval).  Thes are two logical candidates for
+    distinct classes.
+  </p>
+
+  <p>
+    The constructor for the absolute time class should take a
+    <code>dddhhmm</code>
+    value as argument.  You probably want to implement comparison
+    operators.
+  </p>
+
+  <p>
+    The constructor for the relative time class
+    should take two absolute time objects and compute their
+    difference.  You probably want to implement a sum method.
+  </p>
+
+  <p>
+    You may or may not want to implement other constructors and/or
+    methods.
+  </p>
+
+
+  <h3>Reuse</h3>
+
+  <p>
+    Since the output format of
+    <code>find_itinerary</code>
+    conventiently matches its input format, you should be able to
+    reuse your input and time routines in
+    <code>flight_summary</code>.
+  </p>
+
+
+  <h3> Test Data</h3>
+
+  <p>
+    Here are some Washington State airports with selected distances
+    between them (in nautical miles).  You may use this graph to
+    produce your flight data, or generate data on your own.
+  </p>
+
+  <p>
+    <a href="http://courses.washington.edu/css343/bernstein/images/selected-airports.png">
+      <img src="CSS343-Assignment3-Shortest-Path_files/selected-airports.png" alt="Oops" title="Selected Washington State Airports" height="400" width="800">
+    </a>
+  </p>
+
+
+  <h2>Bonus Marks</h2>
+
+  <p>
+    People select flights not only by arrival time.  Modify your
+    program so it takes an additional command-line argument which may
+    be one of the following tokens:
+  </p>
+  <ul>
+    <li>
+      <code>ARRIVAL</code>: find the itinerary with earliest arrival
+      time
+    </li>
+    <li>
+      <code>ENROUTE</code>: find the itinerary with the minimum total
+      time enroute (in-flight plus layover time).
+    </li>
+    <li>
+      <code>INFLIGHT</code>: find the itinerary with minimum total
+      time in flight
+    </li>
+    <li>
+      <code>LAYOVER</code>: find the itinerary with minimum total time
+      spent waiting around an airport
+    </li>
+  </ul>
+
+  <p>
+    Most people also specify an earliest departure time.
+  </p>
+
+  <p>
+    If you've done things right, these should be a relatively small
+    changes to your code.
+  </p>
+
+
+
+
+</body></html>
